@@ -87,21 +87,145 @@
     </section>
   </main>
 
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+<script>
+  window.TrackJS && TrackJS.install({ 
+    token: "2b56ea6ce0e6415b82974535a955fa83"
+    // for more configuration options, see https://docs.trackjs.com
+  });
+</script>
+TrackJS.track('Testing TrackJS!');
+
   <script>
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
-      e.preventDefault();
-      let output = document.querySelector('output');
-      let firstNum = document.querySelector('#first-num').value;
-      let secondNum = document.querySelector('#second-num').value;
-      let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
-    });
+  e.preventDefault();
+  let output = document.querySelector('output');
+  let firstNum = document.querySelector('#first-num').value;
+  let secondNum = document.querySelector('#second-num').value;
+  let operator = document.querySelector('#operator').value;
+
+  try {
+  if (isNaN(firstNum) || isNaN(secondNum)) {
+    throw new CalculationError('Both inputs must be numeric');
+  }
+
+  let result = eval(`${firstNum} ${operator} ${secondNum}`);
+  if (!isFinite(result)) {
+    throw new CalculationError('Cannot divide by zero');
+  }
+
+  output.innerHTML = result;
+} catch (err) {
+  output.innerHTML = 'Error: ' + err.message;
+  if (err instanceof CalculationError) {
+    console.error('Custom error:', err);
+  } else {
+    console.error('Unexpected error:', err);
+  }
+} finally {
+  console.log('Finished evaluation');
+}
+
+});
+class CalculationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'CalculationError';
+  }
+}
+
+
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+    let count = 0;
+
+errorBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const label = btn.textContent;
+
+    switch (label) {
+      case 'Console Log':
+        console.log('This is a console.log example', { value: 42, active: true });
+        break;
+
+      case 'Console Error':
+        console.error('This is a console.error example');
+        break;
+
+      case 'Console Count':
+        console.count('Console Count:');
+        break;
+
+      case 'Console Warn':
+        console.warn('This is a console.warn example');
+        break;
+
+      case 'Console Assert':
+        const isTrue = 2 + 2 === 5;
+        console.assert(isTrue, 'Assertion failed: 2 + 2 !== 5');
+        break;
+
+      case 'Console Clear':
+        console.clear();
+        break;
+
+      case 'Console Dir':
+        console.dir(document.body);
+        break;
+
+      case 'Console dirxml':
+        console.dirxml(document);
+        break;
+
+      case 'Console Group Start':
+        console.group('Grouped Logs');
+        console.log('Inside group 1');
+        console.log('Inside group 2');
+        break;
+
+      case 'Console Group End':
+        console.groupEnd();
+        break;
+
+      case 'Console Table':
+        console.table([
+          { name: 'Alice', age: 25 },
+          { name: 'Bob', age: 30 },
+        ]);
+        break;
+
+      case 'Start Timer':
+        console.time('Timer');
+        break;
+
+      case 'End Timer':
+        console.timeEnd('Timer');
+        break;
+
+      case 'Console Trace':
+        function callA() { callB(); }
+        function callB() { callC(); }
+        function callC() { console.trace('Trace stack'); }
+        callA();
+        break;
+    }
+  });
+});
+
+const triggerErrorBtn = errorBtns.find(btn => btn.textContent.includes('Global Error'));
+triggerErrorBtn.addEventListener('click', () => {
+  undefinedFunctionCall(); // This will throw a ReferenceError
+});
+
+window.onerror = function (message, source, lineno, colno, error) {
+  console.error('Global error caught:', message);
+};
+
+
   </script>
 </body>
 
